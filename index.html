@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Old Typewriter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=Cutive+Mono&family=Mrs+Saint+Delafield&family=Reenie+Beanie&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+  @font-face {
+    font-family: "TT2020";
+    src: url("fonts/TT2020Base-Regular.woff2") format("woff2");
+    font-display: swap;
+  }
+  :root {
+    --bg: #2b2823; --panel: #36322b; --line: #4a453c; --text: #e9e2d0; --muted: #a39b88; --accent: #d9a441;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  .app { display: grid; grid-template-columns: 360px 1fr; min-height: 100vh; }
+  aside { background: var(--panel); border-right: 1px solid var(--line); padding: 16px; overflow-y: auto; max-height: 100vh; position: sticky; top: 0; }
+  h1 { font: 22px "Special Elite", "Courier New", monospace; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 14px; font-size: 12px; }
+  label { display: block; margin: 10px 0 3px; color: var(--muted); font-size: 12px; }
+  textarea, select, input[type=number] { width: 100%; background: #25221d; color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 6px; font: inherit; }
+  textarea { height: 260px; font: 13px/1.4 "Courier New", monospace; resize: vertical; }
+  input[type=range] { width: 100%; accent-color: var(--accent); }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .check { display: flex; align-items: center; gap: 6px; margin: 8px 0 0; color: var(--text); }
+  .btns { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  button { background: var(--accent); color: #231d10; border: 0; border-radius: 4px; padding: 8px 12px; font: 600 13px system-ui; cursor: pointer; }
+  button.alt { background: #4a453c; color: var(--text); }
+  details { margin-top: 12px; color: var(--muted); font-size: 12px; }
+  code { background: #25221d; padding: 1px 4px; border-radius: 3px; color: var(--text); }
+  main { padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+  main canvas { width: 100%; max-width: 820px; height: auto; box-shadow: 0 6px 30px rgba(0,0,0,.55); background: #fff; }
+  .status { color: var(--muted); font-size: 12px; }
+  @media (max-width: 800px) { .app { grid-template-columns: 1fr; } aside { position: static; max-height: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>The Old Typewriter</h1>
+    <p class="sub">Text som om den skrevs på maskin 1953 och rättades av sekreteraren.</p>
+
+    <label for="preset">Land och epok</label>
+    <select id="preset"><option value="">Egna inställningar</option></select>
+    <label for="text">Text</label>
+    <textarea id="text" spellcheck="false"></textarea>
+    <details>
+      <summary>Markering</summary>
+      <p><code>[fel|rätt]</code> skrivs fel, överstrukes och rättas för hand.<br>
+      <code>[|ord]</code> infogas för hand med vinkel.<br>
+      <code>_text_</code> understruket som på maskin.<br>
+      Varje radbrytning är ett vagnretur.</p>
+    </details>
+
+    <div class="row">
+      <div><label for="font">Typsnitt</label><select id="font"></select></div>
+      <div><label for="cpi">Teckentäthet</label>
+        <select id="cpi"><option value="10">Pica (10 tecken/tum)</option><option value="12">Elite (12 tecken/tum)</option></select></div>
+      <div><label for="spacing">Radavstånd</label>
+        <select id="spacing"><option value="1">Enkelt</option><option value="1.5">Ett och ett halvt</option><option value="2">Dubbelt</option></select></div>
+      <div><label for="paper">Papper</label>
+        <select id="paper"><option value="a4">A4</option><option value="letter">Letter</option><option value="quarto">Quarto (8×10 tum)</option></select></div>
+      <div><label for="ink">Färgband</label>
+        <select id="ink"><option value="black">Svart</option><option value="blueblack">Blåsvart</option><option value="purple">Lila (kopiering)</option></select></div>
+      <div><label for="pen">Sekreterarens penna</label>
+        <select id="pen"><option value="blue">Blå kulspets</option><option value="black">Svart bläck</option><option value="red">Röd penna</option></select></div>
+    </div>
+
+    <label for="inkStrength">Bläckstyrka</label><input type="range" id="inkStrength" min="0.4" max="1" step="0.01">
+    <label for="touch">Slagstyrka (hur hårt hon slår)</label><input type="range" id="touch" min="0.2" max="1.5" step="0.01">
+    <label for="relief">Djup i papperet (3D)</label><input type="range" id="relief" min="0" max="1.2" step="0.01">
+    <label for="slop">Ojämnhet (slarv)</label><input type="range" id="slop" min="0" max="1.5" step="0.01">
+    <label for="sigInk">Signatur, bläck</label>
+    <select id="sigInk"><option value="blue">Blått</option><option value="blueblack">Blåsvart</option><option value="black">Svart</option></select>
+    <label for="sigSmudge">Signatur, smetighet</label><input type="range" id="sigSmudge" min="0" max="1" step="0.01">
+    <label for="dirt">Smuts i typerna</label><input type="range" id="dirt" min="0" max="1" step="0.01">
+    <label for="wear">Slitet färgband</label><input type="range" id="wear" min="0" max="1" step="0.01">
+    <label for="typos">Skrivfel som rättas (andel ord)</label><input type="range" id="typos" min="0" max="0.2" step="0.005">
+    <label for="corrStyle">Rättelsestil</label>
+    <select id="corrStyle">
+      <option value="mix">Blandat (x och penna)</option>
+      <option value="x">Överskrivet med x</option>
+      <option value="pen">Genomstruket med penna</option>
+      <option value="eraser">Raderat med gummi och omskrivet</option>
+      <option value="tipex">Tipp-Ex och omskrivet</option>
+      <option value="tape">Korrigeringsband och omskrivet</option>
+      <option value="x+x+pen+eraser">1950-tal: x, penna, radergummi</option>
+      <option value="x+pen+tipex+eraser">1960-tal: x, penna, Tipp-Ex, radergummi</option>
+      <option value="tipex+tape+tape">1970-tal: Tipp-Ex och korrigeringsband</option>
+    </select>
+    <label for="age">Pappersålder</label><input type="range" id="age" min="0" max="1" step="0.01">
+    <label class="check"><input type="checkbox" id="folds"> Veck</label>
+    <label class="check"><input type="checkbox" id="stain"> Kaffefläck</label>
+
+    <label for="seed">Slumptal (samma tal ger samma sida)</label>
+    <input type="number" id="seed">
+    <div class="btns">
+      <button id="reroll">Nytt slumptal</button>
+      <button id="download" class="alt">Ladda ner PNG</button>
+    </div>
+    <p class="status" id="status"></p>
+    <p class="sub">Typsnitt: TT2020 av ctrlcctrlv (OFL). Slumpvärden inspirerade av typewritesomething (MIT).</p>
+  </aside>
+  <main id="pages"></main>
+</div>
+
+<script src="typewriter.js"></script>
+<script>
+const SAMPLE = `Stockholm den 14 mars 1953
+
+Herr Direktör Lindqvist
+AB Nordiska Kullager
+Göteborg
+
+Ang. leverans av kullager
+
+Med hänvisning till Eder skrivelse av den 2 dennes får vi
+härmed meddela att de [bestälda|beställda] kullagren sändes med
+tåg på [mamdag|måndag] nästa vecka.
+
+Vi beklagar den [|något] sena leveransen och hoppas att Ni har
+överseende med detta. Skulle _ytterligare_ frågor uppstå står
+vi givetvis till tjänst.
+
+Högaktningsfullt
+AB SVENSKA LAGERVERK
+
+
+Elsa Bergström
+Sekreterare`;
+
+const $ = (id) => document.getElementById(id);
+const D = Typewriter.DEFAULTS;
+const controls = ['font','cpi','spacing','paper','ink','pen','inkStrength','touch','relief','sigInk','sigSmudge','slop','dirt','wear','typos','corrStyle','age','folds','stain','seed'];
+
+$('text').value = SAMPLE;
+const samples = new Set([SAMPLE]);
+let presetExtra = {};
+for (const [k, p] of Object.entries(Typewriter.PRESETS)) { $('preset').add(new Option(p.label, k)); samples.add(p.sample); }
+$('preset').addEventListener('input', () => {
+  const p = Typewriter.PRESETS[$('preset').value];
+  presetExtra = {};
+  if (!p) return schedule();
+  for (const [k, v] of Object.entries(p.opts)) {
+    const el = $(k);
+    if (el) { if (el.type === 'checkbox') el.checked = v; else el.value = v; } else presetExtra[k] = v;
+  }
+  // only swap the text if the user has not written their own
+  if (samples.has($('text').value)) $('text').value = p.sample;
+  schedule();
+});
+for (const [k, f] of Object.entries(Typewriter.FONTS)) $('font').add(new Option(f.label, k));
+for (const c of controls) {
+  const el = $(c);
+  if (el.type === 'checkbox') el.checked = D[c]; else el.value = D[c];
+  el.addEventListener('input', schedule);
+}
+$('text').addEventListener('input', schedule);
+
+function read() {
+  const o = Object.assign({}, presetExtra);
+  for (const c of controls) {
+    const el = $(c);
+    o[c] = el.type === 'checkbox' ? el.checked
+         : el.type === 'range' || el.type === 'number' || ['cpi', 'spacing'].includes(c) ? parseFloat(el.value) : el.value;
+  }
+  return o;
+}
+
+let timer, token = 0;
+function schedule() { clearTimeout(timer); timer = setTimeout(draw, 150); }
+
+async function draw() {
+  const my = ++token;
+  $('status').textContent = 'Skriver…';
+  const pages = await Typewriter.render($('text').value, Object.assign(read(), { scale: 1.5 }));
+  if (my !== token) return;
+  $('pages').replaceChildren(...pages);
+  $('status').textContent = pages.length + (pages.length === 1 ? ' sida' : ' sidor');
+}
+
+$('reroll').onclick = () => { $('seed').value = Math.floor(Math.random() * 100000); draw(); };
+
+$('download').onclick = async () => {
+  $('status').textContent = 'Renderar i hög upplösning…';
+  const pages = await Typewriter.render($('text').value, Object.assign(read(), { scale: 3 }));
+  pages.forEach((c, i) => setTimeout(() => {
+    const a = document.createElement('a');
+    a.download = `skrivmaskin-sida-${i + 1}.png`;
+    a.href = c.toDataURL('image/png');
+    a.click();
+  }, i * 300));
+  $('status').textContent = 'Klart.';
+};
+
+draw();
+</script>
+</body>
+</html>
