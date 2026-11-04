@@ -45,7 +45,7 @@ Väljaren "Land och epok" (USA, Storbritannien, Sverige × 1950-, 1960-, 1970-ta
 - `fonts/` innehåller TT2020, Special Elite (Apache 2.0), Courier Prime, Cutive Mono, Reenie Beanie och Mrs Saint Delafield (alla OFL-1.1). Licenserna ligger bredvid typsnitten som `LICENSE-*.txt`.
 - `cli/render.js` renderar PNG från terminalen (kör `npm install` i `cli/` först).
 - `examples/` innehåller ett exempelbrev och `.claude/skills/old-typewriter/` är Claude-skillet.
-- Koden i repot har ännu ingen licens. Typsnitten har sina egna.
+- Koden är licensierad under MIT (se `LICENSE`). Typsnitten i `fonts/` har sina egna licenser.
 
 ## Lånat från GitHub
 
